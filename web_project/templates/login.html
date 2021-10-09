@@ -9,18 +9,20 @@
     <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
         <h1 class="display-4 fw-normal">Smth</h1>
         </ul>
-        {{ form.email.label() }} <!--Название-->
-        {{ form.email() }} <!--Поле--> <br> <br>
+        <form action="login" method="post">
 
-        {{ form.password.label() }}
-        {{ form.password() }} <br> <br>
+            {{ form.csrf_token() }}
 
-        {{ form.submit }} <br> <br>
+            {% for field in form if field.email != "csrf_token" %}
+            <p>{{ field.label() }}</p>
+            <p>{{ field }}
+                {% for error in field.errors %}
+                {{ error }}
+                {% endfor %}
+            </p>
+            {% endfor %}
 
-        {# выводим ошибки валидации, связанные с полем #}
-        {% for error in form.email.errors %}
-            {{ error }}
-        {% endfor %}
+        </form>
         <a href="/registration">Reg</a>
     </div>
 </div>
