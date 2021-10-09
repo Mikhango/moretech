@@ -1,16 +1,31 @@
-from flask import Flask, render_template, request, redirect, make_response, url_for, flash
+from flask import Flask, render_template, request, redirect, make_response, url_for, flash, send_file
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
+# from werkzeug.datastructures import T
 from wtforms import StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, Email
-from reg_form import RegForm, LoginForm
+from reg_form import RegForm, LoginForm, DataForm
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask_login import LoginManager, UserMixin, login_required
-from sqlalchemy import MetaData, Table, String, Integer, Column, Text, DateTime, Boolean, engine
-from sqlalchemy import insert, select
+from sqlalchemy import MetaData, Table, String, Integer, Column, Text, DateTime, Boolean, engine, insert, select
+import sqlite3
 
 application = Flask(__name__)
+
+
+conn = sqlite3.connect('users.db')
+cur = conn.cursor()
+
+cur.execute("""CREATE TABLE IF NOT EXISTS user(
+   userid INT PRIMARY KEY,
+   fname TEXT,
+   lname TEXT,
+   email TEXT,
+   password TEXT);
+""")
+conn.commit()
+conn.close()
 
 application.config['SECRET_KEY'] = 'secret key'
 application.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
@@ -18,17 +33,26 @@ application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(application)
 
-metadata = MetaData()
+db.create_all()
 
-users = Table('blog', metadata,
-    Column('id', Integer(), primary_key=True),
-    Column('name', String(100), nullable=False),
-    Column('surname', String(100),  nullable=False),
-    Column('email', String(100),  nullable=False),
-    Column('password    ', Text(), nullable=False),
-    Column('created_on', DateTime(), default=datetime.now),
-    Column('updated_on', DateTime(), default=datetime.now, onupdate=datetime.now)
-)
+def add_column(engine, table_name, column):
+    column_name = column.compile(dialect=engine.dialect)
+    column_type = column.type.compile(engine.dialect)
+    engine.execute('ALTER TABLE %s ADD COLUMN %s %s' % (table_name, column_name, column_type))
+
+
+class User(db.Model):
+    userid = db.Column(db.Integer, primary_key = True)
+    fname = db.Column(db.String(100), nullable = False)
+    lname = db.Column(db.String(100), nullable = False)
+    email = db.Column(db.String(100), nullable = False)
+    password = db.Column(db.String(100), nullable = False)
+
+    #def __repr__(self):
+    #    return '(<User %r>)' % self.id
+
+#class NewTable(db.Model):
+#    new_test_key = db.Column(db.String(100), nullable = False)
 
 @application.route('/')
 def index():
@@ -41,45 +65,88 @@ def register():
 
         email = form.email.data
         password = form.password.data
-        name = form.name.data
-        surname = form.surname.data
+        fname = form.name.data
+        lname = form.surname.data
+
+        dann = User(fname=fname, lname=lname, email=email, password=generate_password_hash(password))
 
         try:
-            ins = users.insert().values(
-                name = 'Dmitriy',
-                surname = 'Yatsenko',
-                email = 'moseend@mail.com',
-                password = '123'
-            )
-            conn = engine.connect()
-            r = conn.execute(ins)
+            db.session.add(dann)
+            db.session.commit()
 
             return redirect(url_for('login'))
         except Exception as e:
-            print(e)
-
-    return render_template('register.html', form=form)
+            print(repr(e))
+            return ''
+    else:
+        return render_template('register.html', form=form)
 
 @application.route('/login', methods=['get', 'post'])
 def login():
     form = LoginForm()
     if request.method == 'POST' and form.validate_on_submit():
-        conn = engine.connect()
+        email = form.email.data
+        password = form.password.data
 
-        s = select([users])
-        r = conn.execute(s)
-        print(r.fetchall())
+        '''
+        try:
+            print(1)
+            all_dann = db.session.query(User).filter_by(email=email).first()[0]
+            print(f'... all_dann: {all_dann}')
+            if all_dann is not None:
+                print(all_dann)
+                if check_password_hash(all_dann.password) == password:
+                    return redirect(url_for('cabinet'))
+
+            return redirect(url_for('login'))
+        except Exception as e:
+            print(repr(e))
+            return ''
+        '''
+        return redirect(url_for('cabinet'))
 
     else:
         return render_template('login.html', title='Login', form=form)
 
-@application.route('/cabinet')
+@application.route('/cabinet', methods=['get', 'post'])
 def cabinet():
-    return render_template('cabinet.html')
+    form = DataForm()
+    if request.method == 'POST' and form.validate_on_submit():
+        '''
+        users = form.users.data.split()
+        ussame = form.ussame.data.split()
+        for el in users:
+            newcol = cur.execute(f"""SELECT {id} FROM users;""")
+            column = Column(f'{el}', String(100), primary_key=True)
+            # add_column(engine, NewTable, column)
+        for el in ussame:
+            newcol = cur.execute(f"""SELECT {id} FROM users;""")
+            column = Column(f'{el}', String(100), primary_key=True)
+            # add_column(engine, NewTable, column)
+        '''
 
-@application.route('/books/<genre>')
-def books(genre):
-    return f"All Books in {genre} category"
+        # db.create_all()
+        return redirect(url_for('download_file'))
+    # print(cur.fetchall())
+    else:
+        return render_template('cabinet.html', title=cabinet, form=form)
+
+@application.route('/profile/<genre>')
+def profile(genre):
+    return f"profile number: {genre}"
+
+
+@application.route('/enter_db')
+def download_file():
+    return send_file('new_table.db')
+
+@application.route('/personal_account')
+def personal():
+    return render_template('pers_account.html')
+
+@application.route('/main')
+def main_page():
+    return render_template('main.html')
 
 if __name__ == "__main__":
-    application.run(host='0.0.0.0')
+    application.run(host='0.0.0.0', debug=True)

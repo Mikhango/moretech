@@ -1,10 +1,18 @@
 /* Login.html */
+
 body {
     background-color:black;
+
 }
 
+ul  {
+    margin: 0;
+    padding: 0;
+}
+
+/* register.html & Login.html */
 .text-center {
-    background-color: #0037ff;
+    background-color: #9498F6;
     border-radius: 15px;
     max-width: 300px;
     box-shadow: 12px 12px 2px 1px rgba(255, 255, 255, 0.2);
@@ -12,6 +20,7 @@ body {
 
 .display-4 {
     color: white;
+    margin-bottom: .5em;
 }
 
 .header-mail {
@@ -29,20 +38,39 @@ body {
 }
 #password {
     border-radius: 5px;
+
 }
 
-#sumbit {
-    padding: 2px 5px;
+#submit {
+    padding: 5px 25px;
+    background-color:  white;
+    border-style: none;
+    border-radius: 2px;
+    transition: .5s;
 }
 
-/* register.html */
+#submit:hover {
+    padding: 5px 25px;
+    background-color:  white;
+    border-style: none;
+    border-radius: 2px;
+    box-shadow: 6px 6px 2px  rgba(255, 255, 255, 0.2);
+}
 
-/* index.html */
+/* index.html  */
 
 .registration-link,
 .login-link {
     text-decoration: none;
+    color: white;
+    transition: .5s;
+}
+
+.registration-link:hover,
+.login-link:hover {
+    text-decoration: none;
     color: black;
+    box-shadow: 6px 6px 2px  rgba(255, 255, 255, 0.2);
 }
 
 .d-flex > p {
@@ -54,13 +82,128 @@ body {
 }
 
 .decotation-link {
-    padding: 5px 10px;
-    border: 1px solid black;
+    padding: 10px 15px;
+    margin-left: 10px;
+    border: 3px solid white;
 
+}
+
+.eror {
+    background-color: #fff;
+    text-align: center;
+    border-radius: 4px;
 }
 
 @media (min-width: 991px) {
     .text-center {
         max-width: 350px;
     }
+}
+
+/*______________ main.html_____________ */
+
+
+/* header */
+
+.upper-block {
+    background-color: #9498F6;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.logo {
+    margin-left: 25px;
+}
+
+.icon {
+    background-color: black;
+    width: 40px;
+    height: 40px;
+    border-radius: 50px;
+    display: inline-block;
+    position: absolute;
+    left: -25px;
+}
+
+
+.accont-block {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-right: 10px;
+    position: relative;
+}
+
+.Name-Lastname {
+    background: #B9BCFD;
+    margin: 0;
+    padding: 1px 20px;
+    text-decoration: none;
+    color: black;
+
+}
+/* main */
+
+.middle-block {
+    display: flex;
+    flex-direction: row;
+}
+
+.left-bar {
+    background:#E3E3E3;
+    width: 20%;
+    height: 100em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+.main-block {
+    background-color: #C4C4C4;
+    width: 80%;
+    height: 100em;
+}
+
+.filters-list {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    background-color: #fff;
+}
+
+.filters-item {
+    list-style-type: none;
+    padding-right: 35px;
+
+}
+
+.filters-buttons {
+    width: 15px;
+    height: 15px;
+}
+
+/* tabs */
+.bar-element {
+    width: 100%;
+    background-color: #D1D1D1;
+    text-align: center;
+    padding: 4px;
+    color: #000;
+    cursor: pointer
+}
+
+.bar-element_active {
+    color: #9498F6;
+    background-color: #fff;
+    border-right: solid 4px #9498F6;
+}
+
+.bar-element__content {
+    display: none;
+}
+
+.bar-element__content_active {
+    display: block;
 }
