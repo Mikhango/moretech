@@ -1,0 +1,66 @@
+/* Login.html */
+body {
+    background-color:black;
+}
+
+.text-center {
+    background-color: #0037ff;
+    border-radius: 15px;
+    max-width: 300px;
+    box-shadow: 12px 12px 2px 1px rgba(255, 255, 255, 0.2);
+}
+
+.display-4 {
+    color: white;
+}
+
+.header-mail {
+    text-align: left;
+}
+
+#name {
+    border-radius: 5px;
+}
+#surname {
+    border-radius: 5px;
+}
+#email {
+    border-radius: 5px;
+}
+#password {
+    border-radius: 5px;
+}
+
+#sumbit {
+    padding: 2px 5px;
+}
+
+/* register.html */
+
+/* index.html */
+
+.registration-link,
+.login-link {
+    text-decoration: none;
+    color: black;
+}
+
+.d-flex > p {
+    color: white;
+}
+
+.text-center > a {
+    color: white;
+}
+
+.decotation-link {
+    padding: 5px 10px;
+    border: 1px solid black;
+
+}
+
+@media (min-width: 991px) {
+    .text-center {
+        max-width: 350px;
+    }
+}

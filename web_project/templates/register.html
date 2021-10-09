@@ -7,14 +7,16 @@
 {% block body %}
 <div class="container">
     <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
-        <h1 class="display-4 fw-normal">Smth</h1>
+        <h1 class="display-4 fw-normal">Registration</h1>
 
         <form action="register" method="post">
 
             {{ form.csrf_token() }}
 
             {% for field in form if field.name != "csrf_token" %}
+            {% if field.name != "submit" %}
             <p>{{ field.label() }}</p>
+            {% endif %}
             <p>{{ field }}
                 {% for error in field.errors %}
                 {{ error }}
@@ -23,7 +25,7 @@
             {% endfor %}
 
         </form>
-        <a href="/register">Log in</a>
+        <a href="/login">Log in</a>
     </div>
 </div>
 {% endblock %}
