@@ -5,29 +5,30 @@ from wtforms import StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, Email
 from reg_form import RegForm, LoginForm
 from werkzeug.security import generate_password_hash, check_password_hash
-
-
-logged = False
-
+from datetime import datetime
+from flask_login import LoginManager, UserMixin, login_required
+from sqlalchemy import MetaData, Table, String, Integer, Column, Text, DateTime, Boolean, engine
+from sqlalchemy import insert, select
 
 application = Flask(__name__)
 
 application.config['SECRET_KEY'] = 'secret key'
 application.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(application)
 
+metadata = MetaData()
 
-class Users(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    surname = db.Column(db.String(100), nullable=False)
-    password = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), nullable=False)
-
-    def __repr__(self) -> str:
-        return f'<Users {self.id}>'
-
+users = Table('blog', metadata,
+    Column('id', Integer(), primary_key=True),
+    Column('name', String(100), nullable=False),
+    Column('surname', String(100),  nullable=False),
+    Column('email', String(100),  nullable=False),
+    Column('password    ', Text(), nullable=False),
+    Column('created_on', DateTime(), default=datetime.now),
+    Column('updated_on', DateTime(), default=datetime.now, onupdate=datetime.now)
+)
 
 @application.route('/')
 def index():
@@ -36,22 +37,26 @@ def index():
 @application.route('/register', methods=['get', 'post'])
 def register():
     form = RegForm()
-    if form.validate_on_submit():
+    if request.method == 'POST' and form.validate_on_submit():
 
         email = form.email.data
         password = form.password.data
         name = form.name.data
         surname = form.surname.data
 
-        user = Users(name=name, surname=surname, email=email, password=generate_password_hash(password))
-
         try:
-            db.session.add(user)
-            db.session.commit()
+            ins = users.insert().values(
+                name = 'Dmitriy',
+                surname = 'Yatsenko',
+                email = 'moseend@mail.com',
+                password = '123'
+            )
+            conn = engine.connect()
+            r = conn.execute(ins)
 
             return redirect(url_for('login'))
-        except:
-            return 'Error'
+        except Exception as e:
+            print(e)
 
     return render_template('register.html', form=form)
 
@@ -59,19 +64,16 @@ def register():
 def login():
     form = LoginForm()
     if request.method == 'POST' and form.validate_on_submit():
-        email = form.email.data
-        password = form.password.data
+        conn = engine.connect()
 
-        curs = db.cursor()
-        info = curs.execute('SELECT * FROM users WHERE email=? password=?', (email, generate_password_hash(password)))
-        if info.fetchone() is None:
-            return redirect(url_for('register'))
-        else:
-            return redirect(url_for('cabinet'))
+        s = select([users])
+        r = conn.execute(s)
+        print(r.fetchall())
+
     else:
         return render_template('login.html', title='Login', form=form)
 
-@application.route('/')
+@application.route('/cabinet')
 def cabinet():
     return render_template('cabinet.html')
 
